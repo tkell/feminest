@@ -1,6 +1,3 @@
-
-
-
 import re
 import requests
 from pyechonest import artist
