@@ -15,24 +15,44 @@ var rdioKey = 't76jvrgf3ttrhey8u99ed26h';
 var rdioSecret = 'Wwv5vsXNpu';
 var rdioPlaybackToken = 'GAxSm_R0_____2R2cHlzNHd5ZXg3Z2M0OXdoaDY3aHdrbnRpZGUtcG9vbC5jYV5s1ipq5M6O6hlq_CajEyc=';
 
-
+var artistName = '';
 var callback_object = {};
 
+
+
 callback_object.ready = function ready(user) {
-  // Called once the API SWF has loaded and is ready to accept method calls.
-  var rdioApi = $('#rdio-api').get(0);
-
-  // figure out what our rdio id to play is here!!
-
-  rdioApi.rdio_play('a997982');
+    // Called once the API SWF has loaded and is ready to accept method calls.
+    // the call, ish
 }
 
+function playRdio() {
+    var albumID = '';
+    var url = 'http://developer.echonest.com/api/v4/song/search?api_key=WOUHTN44BMS5SMPF2&format=json&results=5&bucket=id:rdio-US&bucket=tracks&limit=true&sort=song_hotttnesss-desc&artist=' + artistName
+    $.getJSON(url, function(data) {
+        console.log(url);
+    })
+    .done(function(data) {
+        rdioSongs = data.response.songs;
+        for (var i = 0; i < rdioSongs.length; i++ ) {
+            albumID = rdioSongs[i].tracks[0].foreign_release_id
+            albumID = albumID.replace('rdio-US:release:', '');
+            if (albumID != '') {
+                break;
+            }
+        }
+        var rdioApi = $('#rdio-api').get(0);
+        rdioApi.rdio_play(albumID);
+    })
+    .fail(function(data) {
+        console.log("Call for Rdio albums failed!");
+    });
+}
 
 function setUpRdio() {
     var flashvars = {
-        'playbackToken': rdioPlaybackToken, // from token.js
-        'domain': 'tide-pool.ca',                // from token.js
-        'listener': 'callback_object'    // the global name of the object that will receive callbacks from the SWF
+        'playbackToken': rdioPlaybackToken, 
+        'domain': 'tide-pool.ca', 
+        'listener': 'callback_object'  
     };
 
     var params = {
@@ -150,6 +170,8 @@ function addDiscogsLinks(data) {
 } 
 
 $(document).ready(function() {
+    setUpRdio();
+
     $("button#get-json").click(function() {
         // clear any old data
         $('#echonest-images').empty();
@@ -157,17 +179,19 @@ $(document).ready(function() {
         $("div#gender-result").empty();
         $("div#gender-text").empty();
 
+        // Stop the music!
+        var rdioApi = $('#rdio-api').get(0);
+        rdioApi.rdio_stop();
+
         $("#gender-result").css('color', '#000000');
         $('#gender-result').html('One moment please, talking to the internet...');
 
-        var artistName = $("input#artist-name").val();
+        artistName = $("input#artist-name").val();
         var url = "http://feminest.herokuapp.com/get-data/" + artistName;
         $.getJSON(url, function(data) {
-
             console.log(url);  
         })
         .done(function(data) {
-            console.log('got json from server');
             gender = (guessGender(data));
 
             $("div#gender-result").empty();
@@ -187,8 +211,7 @@ $(document).ready(function() {
             if (gender != 'male' && gender != 'ambig-male') {
                 addDiscogsLinks(data);
                 addEchoNestImages(data);
-                setUpRdio();
-                // put a stop button in here
+                playRdio();
             }
         })
         .fail(function(data) {
