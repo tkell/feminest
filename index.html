@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>The Feminest</title>
+    <link href="main.css" rel="stylesheet">
+</head>
+
+<body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script>
+
+var genderResults = {'female':  "Put your hands up!  At least half of this band are ladies.",
+                     'male':  "Hello, gentleman/men.  Sorry lads, no songs for you.",
+                     'ambig':  "No idea, but hey, why not.",
+                     'ambig-female':  "If they're not 50% ladies, they're standing next to a band that is.",
+                     'ambig-male':  "Can't be sure, but probably too many bros.",
+                     'fail':  "Data fail, sorry!"
+                };
+var gender;
+
+function guessGender(data) {
+    var members = parseInt(data.members);
+    var female_pronouns = parseInt(data.female_pronouns);
+    var male_pronouns = parseInt(data.male_pronouns);
+    var women = parseInt(data.women);
+    var men = parseInt(data.men);
+    var totalPronouns = male_pronouns + female_pronouns;  
+    var tolerance = parseInt(totalPronouns * 0.05);
+
+    if (members == 1) { // single artist
+        if (female_pronouns >= male_pronouns + tolerance) {
+            return 'female';
+        } else if (female_pronouns > male_pronouns - tolerance) {
+            return 'ambig';
+        } else {
+            return 'male';
+        }
+    }
+    else { // band - ambig
+        if (women + men != members) {
+            if (women >= men) {
+                return 'ambig-female'
+            }
+            else if (women < men) {
+                return 'ambig-male'
+            }
+            else  {
+                return 'ambig'
+            }
+        }
+        else { // band - hopefully not ambig
+            if (women >= men) {
+                return 'female';
+            }
+            else if (women < men && male_pronouns + tolerance > female_pronouns) {
+                return 'male';
+            } 
+            else {
+                return 'ambig';
+            }
+        }
+    }
+    return 'fail';
+}
+
+function buildString(data) {
+    women = data.women;
+    men = data.men;
+
+    if (data.members == 1 && gender == 'female') {
+        women = 1;
+    }
+    else if (data.members == 1 && gender == 'male') {
+        men = 1;
+    } else if (data.members == 1 && gender.indexOf('ambig') != -1) {
+        women = '??';
+        men = '??';
+    }
+
+    string = 'Found <span class="emph-text">' + data.number_bios + '</span> biographies, ';
+    string += 'with <span class="emph-text">' + data.word_count + '</span> words.<br/>';
+    string += '<span class="emph-text">' + data.female_pronouns + '</span> female pronouns found, and <span class="emph-text">' + data.male_pronouns + '</span> male pronouns.<br/>';
+    string += '<span class="emph-text">' + data.female_names + '</span> female names found, and <span class="emph-text">' + data.male_names + '</span> male names.<br/>';
+    string += '<span class="emph-text">' + data.members + '</span> total member(s), of which <span class="emph-text">' + women + '</span> are female, and <span class="emph-text">' + men + '</span> are male.  ';
+    return string;
+}
+
+function addEchoNestImages(data) {
+    for (var i = 0; i < data.image_urls.length; i++) {
+        var url = data.image_urls[i];
+        var imgString = '<img id="en-' + i + '" src="' + url + '" />';
+        $('#echonest-images').append(imgString);
+    }    
+}
+
+function addDiscogsLinks(data) {
+    for (var i = 0; i < data.discogs_release.length; i++) {
+        var release = data.discogs_release[i];
+
+        var htmlString = '';
+        var imgString = '<img id="discogs-' + i + '" src="' + release.thumbnail + '" />';
+
+        if (release.url != '') {
+            htmlString = '<a href="' + release.url+ '">' + imgString + '</a>';
+        } else {
+            htmlString = imgString;
+        }
+
+        console.log(htmlString);
+
+        $('#discogs-data').append(htmlString);
+    }    
+} 
+
+$(document).ready(function() {
+    $("button#get-json").click(function() {
+        // clear any old data
+        $('#echonest-images').empty();
+        $('#discogs-data').empty();
+        $("div#gender-result").empty();
+        $("div#gender-text").empty();
+
+        $("#gender-result").css('color', '#000000');
+        $('#gender-result').html('One moment please, talking to the internet...');
+
+        var artistName = $("input#artist-name").val();
+        var url = "http://feminest.herokuapp.com/get-data/" + artistName;
+        $.getJSON(url, function(data) {
+
+            console.log(url);  
+        })
+        .done(function(data) {
+            console.log('got json from server');
+            gender = (guessGender(data));
+
+            $("div#gender-result").empty();
+            $("div#gender-result").html(genderResults[gender]);
+
+            // Update css for the display string
+            if (gender == 'male') {
+                $("#gender-result").css('color', '#00008B');
+            } else if (gender == 'female') {
+                $("#gender-result").css('color', '#CD1076');
+            } else if (gender.indexOf('ambig') != -1) {
+               $("#gender-result").css('color', '#68228B'); 
+            }
+
+            $("div#gender-text").html(buildString(data));
+
+            if (gender != 'male' && gender != 'ambig-male') {
+                addDiscogsLinks(data);
+                addEchoNestImages(data);  
+            }
+        })
+        .fail(function(data) {
+        $("#gender-result").css('color', '#000000');
+            $("div#gender-result").empty();
+            $('#gender-result').html('Sorry, we have yet to process that artist!  Try another?');
+            console.log("failed");
+        });
+    }); // end click
+}); // End init
+
+</script>
+
+
+<div id="splash">THE <span id="pink">FEMI</span><span id="blue">NEST</span></div>
+
+<div id="input-div">
+Enter an Artist:  
+<input id="artist-name" type="text">
+<button id="get-json" type="button">Go!</button>
+</div>
+
+<div id="artist-splash"></div>
+
+<div id="gender-result"></div>
+<div id="gender-text"></div>
+<div id="discogs-data"></div>
+<div id="echonest-images"></div>
+
+<img src="http://echonest.com/static/img/logos/250x80_lt.gif">
+<div id="footer">a hack by thor kell, for tufts hack day 2013</div>
+
+</body>
+</html>

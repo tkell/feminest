@@ -1,0 +1,44 @@
+body { 
+    background-color: #FEF9ED;
+    text-align: center;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+}
+
+div#splash {
+    font-size: 300%;
+}
+div#subsplash {
+    font-size: 150%;
+}
+div#input-div{
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+div#gender-result{
+    margin-bottom: 10px;
+    font-size: 200%;
+}
+
+div#gender-text{
+    margin-bottom: 25px;
+}
+
+div#footer {
+    font-size: 85%;
+}
+
+span#pink{
+    color: #CD1076;
+    font-weight: bold;
+}
+
+span#blue{
+    color: #08c;
+    font-weight: bold;
+}
+
+span.emph-text{
+    font-size: 115%;
+    font-weight: bold;
+}
