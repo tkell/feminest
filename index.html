@@ -8,12 +8,43 @@
 
 <body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<script src="jquery.rdio.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 <script>
 
 var rdioKey = 't76jvrgf3ttrhey8u99ed26h'; 
 var rdioSecret = 'Wwv5vsXNpu';
 var rdioPlaybackToken = 'GAxSm_R0_____2R2cHlzNHd5ZXg3Z2M0OXdoaDY3aHdrbnRpZGUtcG9vbC5jYV5s1ipq5M6O6hlq_CajEyc=';
+
+
+var callback_object = {};
+
+callback_object.ready = function ready(user) {
+  // Called once the API SWF has loaded and is ready to accept method calls.
+  var rdioApi = $('#rdio-api').get(0);
+
+  // figure out what our rdio id to play is here!!
+
+  rdioApi.rdio_play('a997982');
+}
+
+
+function setUpRdio() {
+    var flashvars = {
+        'playbackToken': rdioPlaybackToken, // from token.js
+        'domain': 'tide-pool.ca',                // from token.js
+        'listener': 'callback_object'    // the global name of the object that will receive callbacks from the SWF
+    };
+
+    var params = {
+        'allowScriptAccess': 'always'
+     };
+
+    var attributes = {};
+
+    swfobject.embedSWF('http://www.rdio.com/api/swf/', // the location of the Rdio Playback API SWF
+      'rdio-api', // the ID of the element that will be replaced with the SWF
+      1, 1, '9.0.0', 'expressInstall.swf', flashvars, params, attributes);
+}
 
 var genderResults = {'female':  "Put your hands up!  At least half of this band are ladies.",
                      'male':  "Hello, gentleman/men.  Sorry lads, no songs for you.",
@@ -156,7 +187,8 @@ $(document).ready(function() {
             if (gender != 'male' && gender != 'ambig-male') {
                 addDiscogsLinks(data);
                 addEchoNestImages(data);
-                $('#rdio-api').rdio(rdioPlaybackToken);
+                setUpRdio();
+                // put a stop button in here
             }
         })
         .fail(function(data) {
