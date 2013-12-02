@@ -8,7 +8,12 @@
 
 <body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="jquery.rdio.min.js"></script>
 <script>
+
+var rdioKey = 't76jvrgf3ttrhey8u99ed26h'; 
+var rdioSecret = 'Wwv5vsXNpu';
+var rdioPlaybackToken = 'GAxSm_R0_____2R2cHlzNHd5ZXg3Z2M0OXdoaDY3aHdrbnRpZGUtcG9vbC5jYV5s1ipq5M6O6hlq_CajEyc=';
 
 var genderResults = {'female':  "Put your hands up!  At least half of this band are ladies.",
                      'male':  "Hello, gentleman/men.  Sorry lads, no songs for you.",
@@ -150,7 +155,8 @@ $(document).ready(function() {
 
             if (gender != 'male' && gender != 'ambig-male') {
                 addDiscogsLinks(data);
-                addEchoNestImages(data);  
+                addEchoNestImages(data);
+                $('#rdio-api').rdio(rdioPlaybackToken);
             }
         })
         .fail(function(data) {
@@ -178,6 +184,7 @@ Enter an Artist:
 <div id="gender-result"></div>
 <div id="gender-text"></div>
 <div id="discogs-data"></div>
+<div id="rdio-api"></div>
 <div id="echonest-images"></div>
 
 <img src="http://echonest.com/static/img/logos/250x80_lt.gif">
