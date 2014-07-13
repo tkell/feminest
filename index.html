@@ -207,7 +207,7 @@ $(document).ready(function() {
             $("div#gender-text").html(buildString(data));
 
             if (gender != 'male' && gender != 'ambig-male') {
-                addDiscogsLinks(data);
+                // addDiscogsLinks(data); // Removed 07-2014, due to Discogs needed auth.
                 addEchoNestImages(data);
                 playRdio();
             }
