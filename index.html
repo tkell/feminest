@@ -117,8 +117,6 @@ function addDiscogsLinks(data) {
 } 
 
 $(document).ready(function() {
-    setUpRdio();
-
     $("button#get-json").click(function() {
         // clear any old data
         $('#echonest-images').empty();
@@ -155,7 +153,6 @@ $(document).ready(function() {
             if (gender != 'male' && gender != 'ambig-male') {
                 // addDiscogsLinks(data); // Removed 07-2014, due to Discogs needed auth.
                 addEchoNestImages(data);
-                playRdio();
             }
         })
         .fail(function(data) {
@@ -185,8 +182,8 @@ Enter an Artist:
 <div id="discogs-data"></div>
 <div id="echonest-images"></div>
 
-<img src="http://echonest.com/static/img/logos/250x80_lt.gif">
-<div id="footer">a hack by thor kell, for tufts hack day 2013</div>
+<img src="en.gif">
+<div id="footer">a hack by thor kell, for tufts hack day 2013 / Gender In Music MMHD 2016</div>
 
 </body>
 </html>
