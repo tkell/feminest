@@ -11,59 +11,8 @@
 <script src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 <script>
 
-var rdioPlaybackToken = 'GAxSm_R0_____2R2cHlzNHd5ZXg3Z2M0OXdoaDY3aHdrbnRpZGUtcG9vbC5jYV5s1ipq5M6O6hlq_CajEyc=';
-
 var artistName = '';
 var callback_object = {};
-
-
-
-callback_object.ready = function ready(user) {
-    // Called once the API SWF has loaded and is ready to accept method calls.
-    // the call, ish
-}
-
-function playRdio() {
-    var albumID = '';
-    var url = 'http://developer.echonest.com/api/v4/song/search?api_key=WOUHTN44BMS5SMPF2&format=json&results=5&bucket=id:rdio-US&bucket=tracks&limit=true&sort=song_hotttnesss-desc&artist=' + artistName
-    $.getJSON(url, function(data) {
-        console.log(url);
-    })
-    .done(function(data) {
-        rdioSongs = data.response.songs;
-        for (var i = 0; i < rdioSongs.length; i++ ) {
-            albumID = rdioSongs[i].tracks[0].foreign_release_id
-            albumID = albumID.replace('rdio-US:release:', '');
-            if (albumID != '') {
-                break;
-            }
-        }
-        var rdioApi = $('#rdio-api').get(0);
-        rdioApi.rdio_play(albumID);
-    })
-    .fail(function(data) {
-        console.log("Call for Rdio albums failed!");
-    });
-}
-
-function setUpRdio() {
-    var flashvars = {
-        'playbackToken': rdioPlaybackToken, 
-        'domain': 'tide-pool.ca', 
-        'listener': 'callback_object'  
-    };
-
-    var params = {
-        'allowScriptAccess': 'always'
-     };
-
-    var attributes = {};
-
-    swfobject.embedSWF('http://www.rdio.com/api/swf/', // the location of the Rdio Playback API SWF
-      'rdio-api', // the ID of the element that will be replaced with the SWF
-      1, 1, '9.0.0', 'expressInstall.swf', flashvars, params, attributes);
-}
-
 var genderResults = {'female':  "Put your hands up!  At least half of this band are ladies.",
                      'male':  "Hello, gentleman/men.  Sorry lads, no songs for you.",
                      'ambig':  "No idea, but hey, why not.",
@@ -168,8 +117,6 @@ function addDiscogsLinks(data) {
 } 
 
 $(document).ready(function() {
-    setUpRdio();
-
     $("button#get-json").click(function() {
         // clear any old data
         $('#echonest-images').empty();
@@ -178,9 +125,6 @@ $(document).ready(function() {
         $("div#gender-text").empty();
 
         // Stop the music!
-        var rdioApi = $('#rdio-api').get(0);
-        rdioApi.rdio_stop();
-
         $("#gender-result").css('color', '#000000');
         $('#gender-result').html('One moment please, talking to the internet...');
 
@@ -209,7 +153,6 @@ $(document).ready(function() {
             if (gender != 'male' && gender != 'ambig-male') {
                 // addDiscogsLinks(data); // Removed 07-2014, due to Discogs needed auth.
                 addEchoNestImages(data);
-                playRdio();
             }
         })
         .fail(function(data) {
@@ -233,15 +176,12 @@ Enter an Artist:
 </div>
 
 <div id="artist-splash"></div>
-
 <div id="gender-result"></div>
 <div id="gender-text"></div>
 <div id="discogs-data"></div>
-<div id="rdio-api"></div>
 <div id="echonest-images"></div>
 
-<img src="http://echonest.com/static/img/logos/250x80_lt.gif">
-<div id="footer">a hack by thor kell, for tufts hack day 2013</div>
-
+<img src="en.gif">
+<div id="footer">a hack by thor kell, for tufts hack day 2013 / gender in music mmhd 2016</div>
 </body>
 </html>
